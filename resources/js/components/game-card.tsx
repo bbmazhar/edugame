@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import {
     Calculator,
     LayoutGrid,
@@ -27,7 +28,13 @@ export type CatalogGame = {
     icon: string | null;
 };
 
-export default function GameCard({ game }: { game: CatalogGame }) {
+export default function GameCard({
+    game,
+    levelCode,
+}: {
+    game: CatalogGame;
+    levelCode: string | null;
+}) {
     const Icon = (game.icon && ICONS[game.icon]) || Puzzle;
 
     return (
@@ -50,13 +57,22 @@ export default function GameCard({ game }: { game: CatalogGame }) {
                 <p className="text-sm text-muted-foreground">{game.description}</p>
             )}
 
-            <button
-                type="button"
-                disabled
-                className="mt-auto min-h-11 cursor-not-allowed rounded-md bg-muted px-4 py-2 text-sm font-medium text-muted-foreground"
-            >
-                Segera hadir
-            </button>
+            {levelCode ? (
+                <Link
+                    href={`/main/${game.slug}?level=${levelCode}`}
+                    className="mt-auto inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+                >
+                    Main
+                </Link>
+            ) : (
+                <button
+                    type="button"
+                    disabled
+                    className="mt-auto min-h-11 cursor-not-allowed rounded-md bg-muted px-4 py-2 text-sm font-medium text-muted-foreground"
+                >
+                    Segera hadir
+                </button>
+            )}
         </div>
     );
 }

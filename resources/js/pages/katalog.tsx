@@ -37,7 +37,11 @@ export default function Katalog({ levels, selectedLevel, games }: KatalogProps) 
                     (games.length > 0 ? (
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {games.map((game) => (
-                                <GameCard key={game.id} game={game} />
+                                <GameCard
+                                    key={game.id}
+                                    game={game}
+                                    levelCode={selectedLevel}
+                                />
                             ))}
                         </div>
                     ) : (
