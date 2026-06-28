@@ -19,3 +19,11 @@ export type AuthLayoutProps = {
     title?: string;
     description?: string;
 };
+
+export type AccessibilitySettings = {
+    reduced_motion: boolean;
+    sound: boolean;
+    theme: 'default' | 'calm';
+    high_contrast: boolean;
+    font: 'default' | 'dyslexic';
+};

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Profile;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,10 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'accessibility' => array_merge(
+                Profile::defaultSettings(),
+                $request->user()?->profile?->settings ?? [],
+            ),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

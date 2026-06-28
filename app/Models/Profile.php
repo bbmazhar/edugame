@@ -22,6 +22,22 @@ class Profile extends Model
         ];
     }
 
+    /**
+     * Default accessibility / preference settings for a profile.
+     *
+     * @return array<string, mixed>
+     */
+    public static function defaultSettings(): array
+    {
+        return [
+            'reduced_motion' => false,
+            'sound' => true,
+            'theme' => 'calm',
+            'high_contrast' => false,
+            'font' => 'default',
+        ];
+    }
+
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
