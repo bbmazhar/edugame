@@ -199,8 +199,8 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
                 <>
                     <div className="mb-6 flex items-center justify-between text-sm">
                         <span className="text-muted-foreground">Ronde {answered + 1}</span>
-                        <span className="font-medium">Skor {correct * 10}</span>
-                        <span className="tabular-nums text-muted-foreground">{seconds}s</span>
+                        <span className="font-medium">Benar {correct}</span>
+                        <span className="text-muted-foreground tabular-nums">{seconds}s</span>
                         <button
                             type="button"
                             onClick={togglePause}

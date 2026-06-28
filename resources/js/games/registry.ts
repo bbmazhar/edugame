@@ -1,5 +1,6 @@
 import type { GameEntry } from '@/types/game';
 import dummyGame from './dummy-game';
+import hitungCepat from './hitung-cepat';
 
 /**
  * Maps a game slug to its implementation. Real games are registered here in
@@ -7,7 +8,7 @@ import dummyGame from './dummy-game';
  * full play → score → save pipeline can be exercised.
  */
 const registry: Record<string, GameEntry> = {
-    // 'hitung-cepat': hitungCepat,
+    'hitung-cepat': hitungCepat as GameEntry,
 };
 
 export function resolveGame(slug: string): GameEntry {
