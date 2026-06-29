@@ -361,7 +361,7 @@ function AnagramBoard({
         <div className="flex w-full flex-col items-center gap-4">
             <p className="text-sm text-muted-foreground">Susun semua huruf menjadi kata</p>
 
-            <div className="flex min-h-14 min-w-[12rem] items-center justify-center gap-2 rounded-lg border border-border bg-card px-4">
+            <div className="flex min-h-14 min-w-48 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4">
                 {used.length > 0 ? (
                     used.map((i, k) => (
                         <span key={k} className="text-2xl font-bold">
@@ -485,7 +485,7 @@ function SearchBoard({
                                 onClick={() => tap(r, c)}
                                 aria-label={`Huruf ${ch}`}
                                 className={cn(
-                                    'flex aspect-square items-center justify-center rounded text-xs font-bold sm:text-sm',
+                                    'flex aspect-square min-h-9 items-center justify-center rounded text-sm font-bold sm:min-h-10 sm:text-base',
                                     isFound
                                         ? 'bg-primary text-primary-foreground'
                                         : isFirst

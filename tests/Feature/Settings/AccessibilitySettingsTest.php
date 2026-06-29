@@ -25,8 +25,8 @@ class AccessibilitySettingsTest extends TestCase
 
         $this->assertTrue($settings['reduced_motion']);
         $this->assertSame('default', $settings['theme']);
-        // Untouched keys fall back to defaults.
-        $this->assertTrue($settings['sound']);
+        // Untouched keys fall back to defaults (sound is off by default).
+        $this->assertFalse($settings['sound']);
         $this->assertFalse($settings['high_contrast']);
     }
 

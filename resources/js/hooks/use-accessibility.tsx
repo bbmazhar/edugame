@@ -13,7 +13,7 @@ const STORAGE_KEY = 'accessibility';
 
 export const DEFAULT_ACCESSIBILITY: AccessibilitySettings = {
     reduced_motion: false,
-    sound: true,
+    sound: false,
     theme: 'calm',
     high_contrast: false,
     font: 'default',
