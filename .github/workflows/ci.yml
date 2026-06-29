@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (PHP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3, gd, zip, bcmath, fileinfo, curl, intl
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      # Build assets so Inertia page-render tests can resolve the Vite manifest.
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Lint (Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Tests (PHPUnit)
+        run: php artisan test
+
+  frontend:
+    name: Frontend (Node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint:check
+
+      - name: Typecheck
+        run: npm run types:check
+
+      - name: Unit tests (Vitest)
+        run: npm run test:unit
+
+      - name: Build
+        run: npm run build

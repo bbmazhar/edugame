@@ -8,6 +8,7 @@
         "dev": "vite",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
+        "check": "npm run lint:check && npm run types:check && npm run test:unit",
         "lint": "eslint . --fix",
         "lint:check": "eslint .",
         "test:unit": "vitest run",
