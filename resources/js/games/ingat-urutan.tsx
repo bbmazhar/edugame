@@ -1,6 +1,11 @@
-import { cn } from '@/lib/utils';
-import type { GameEntry, GameModule, GameParams, GameRoundProps } from '@/types/game';
 import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
+import type {
+    GameEntry,
+    GameModule,
+    GameParams,
+    GameRoundProps,
+} from '@/types/game';
 
 export const PAD_COUNT = 4;
 
@@ -37,13 +42,23 @@ export type SimonSettings = {
 
 function toNumber(value: unknown, fallback: number): number {
     const n = Number(value);
+
     return Number.isFinite(n) ? n : fallback;
 }
 
 export function readSettings(params: GameParams): SimonSettings {
-    const startLength = Math.max(2, Math.floor(toNumber(params.start_length, 3)));
-    const maxLength = Math.max(startLength, Math.floor(toNumber(params.max_length, 7)));
-    const modality = params.modality === 'number' || params.modality === 'sound' ? params.modality : 'color';
+    const startLength = Math.max(
+        2,
+        Math.floor(toNumber(params.start_length, 3)),
+    );
+    const maxLength = Math.max(
+        startLength,
+        Math.floor(toNumber(params.max_length, 7)),
+    );
+    const modality =
+        params.modality === 'number' || params.modality === 'sound'
+            ? params.modality
+            : 'color';
 
     return {
         startLength,
@@ -58,7 +73,9 @@ function randomSequence(length: number): number[] {
     return Array.from({ length }, () => Math.floor(Math.random() * PAD_COUNT));
 }
 
-export function createModule(params: GameParams): GameModule<SimonRound, SimonAnswer> {
+export function createModule(
+    params: GameParams,
+): GameModule<SimonRound, SimonAnswer> {
     const settings = readSettings(params);
     let currentLength = settings.startLength;
     let sequence: number[] = [];
@@ -78,6 +95,7 @@ export function createModule(params: GameParams): GameModule<SimonRound, SimonAn
             if (finished) {
                 return null;
             }
+
             return {
                 sequence: [...sequence],
                 currentLength,
@@ -108,6 +126,7 @@ export function createModule(params: GameParams): GameModule<SimonRound, SimonAn
             }
 
             finished = true;
+
             return { correct: false };
         },
         isFinished() {
@@ -116,7 +135,10 @@ export function createModule(params: GameParams): GameModule<SimonRound, SimonAn
         getResult() {
             return {
                 score: bestLength,
-                accuracy: settings.maxLength > 0 ? (bestLength / settings.maxLength) * 100 : 0,
+                accuracy:
+                    settings.maxLength > 0
+                        ? (bestLength / settings.maxLength) * 100
+                        : 0,
                 rounds: roundsCompleted,
                 durationMs: 0,
                 meta: {
@@ -129,7 +151,11 @@ export function createModule(params: GameParams): GameModule<SimonRound, SimonAn
     };
 }
 
-function SimonBoard({ round, onAnswer, disabled }: GameRoundProps<SimonRound, SimonAnswer>) {
+function SimonBoard({
+    round,
+    onAnswer,
+    disabled,
+}: GameRoundProps<SimonRound, SimonAnswer>) {
     const [phase, setPhase] = useState<'showing' | 'input'>('showing');
     const [litPad, setLitPad] = useState<number | null>(null);
     const [inputCount, setInputCount] = useState(0);
@@ -149,7 +175,9 @@ function SimonBoard({ round, onAnswer, disabled }: GameRoundProps<SimonRound, Si
         const step = round.showMs + round.gapMs;
         round.sequence.forEach((pad, k) => {
             timers.current.push(setTimeout(() => setLitPad(pad), k * step));
-            timers.current.push(setTimeout(() => setLitPad(null), k * step + round.showMs));
+            timers.current.push(
+                setTimeout(() => setLitPad(null), k * step + round.showMs),
+            );
         });
         timers.current.push(
             setTimeout(() => setPhase('input'), round.sequence.length * step),
@@ -195,7 +223,9 @@ function SimonBoard({ round, onAnswer, disabled }: GameRoundProps<SimonRound, Si
                     ? 'Perhatikan urutannya…'
                     : `Ulangi urutan: ${inputCount}/${round.currentLength}`}
             </p>
-            <p className="text-xs text-muted-foreground">Level {round.currentLength}</p>
+            <p className="text-xs text-muted-foreground">
+                Level {round.currentLength}
+            </p>
 
             <div className="grid grid-cols-2 gap-3">
                 {Array.from({ length: round.padCount }, (_, i) => {
@@ -208,8 +238,16 @@ function SimonBoard({ round, onAnswer, disabled }: GameRoundProps<SimonRound, Si
                             type="button"
                             disabled={disabled || phase !== 'input'}
                             onClick={() => tap(i)}
-                            aria-label={isNumber ? `Angka ${i + 1}` : `Pad ${PADS[i].label}`}
-                            style={isNumber ? undefined : { backgroundColor: PADS[i].hex }}
+                            aria-label={
+                                isNumber
+                                    ? `Angka ${i + 1}`
+                                    : `Pad ${PADS[i].label}`
+                            }
+                            style={
+                                isNumber
+                                    ? undefined
+                                    : { backgroundColor: PADS[i].hex }
+                            }
                             className={cn(
                                 'flex aspect-square min-h-20 min-w-20 items-center justify-center rounded-2xl border border-black/10 text-3xl font-bold transition-[opacity,transform]',
                                 isNumber

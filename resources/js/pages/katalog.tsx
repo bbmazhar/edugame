@@ -1,7 +1,9 @@
-import GameCard, { type CatalogGame } from '@/components/game-card';
-import LevelPicker, { type CatalogLevel } from '@/components/level-picker';
-import PublicLayout from '@/layouts/public-layout';
 import { Head } from '@inertiajs/react';
+import GameCard from '@/components/game-card';
+import type { CatalogGame } from '@/components/game-card';
+import LevelPicker from '@/components/level-picker';
+import type { CatalogLevel } from '@/components/level-picker';
+import PublicLayout from '@/layouts/public-layout';
 
 type KatalogProps = {
     levels: CatalogLevel[];
@@ -9,7 +11,11 @@ type KatalogProps = {
     games: CatalogGame[];
 };
 
-export default function Katalog({ levels, selectedLevel, games }: KatalogProps) {
+export default function Katalog({
+    levels,
+    selectedLevel,
+    games,
+}: KatalogProps) {
     return (
         <PublicLayout>
             <Head title="Katalog Game" />
@@ -20,8 +26,8 @@ export default function Katalog({ levels, selectedLevel, games }: KatalogProps) 
                         Katalog Game
                     </h1>
                     <p className="text-muted-foreground">
-                        Pilih jenjang untuk melihat game yang sesuai. Tidak perlu
-                        akun untuk mulai bermain.
+                        Pilih jenjang untuk melihat game yang sesuai. Tidak
+                        perlu akun untuk mulai bermain.
                     </p>
                 </header>
 

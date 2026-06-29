@@ -1,9 +1,14 @@
+import { Link, usePage } from '@inertiajs/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAccessibility } from '@/hooks/use-accessibility';
 import { postJson } from '@/lib/csrf';
 import { addGuestSession } from '@/lib/guest-progress';
-import type { GameEntry, GameModule, GameParams, GameResult } from '@/types/game';
-import { Link, usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type {
+    GameEntry,
+    GameModule,
+    GameParams,
+    GameResult,
+} from '@/types/game';
 
 type Phase = 'intro' | 'countdown' | 'playing' | 'result';
 
@@ -14,14 +19,25 @@ type ServerStats = {
 } | null;
 
 type GameShellProps = {
-    game: { id: number; slug: string; name: string; cognitive_domain?: string | null };
+    game: {
+        id: number;
+        slug: string;
+        name: string;
+        cognitive_domain?: string | null;
+    };
     level: { id: number; code: string; name: string };
     params: GameParams;
     entry: GameEntry;
     catalogHref: string;
 };
 
-export default function GameShell({ game, level, params, entry, catalogHref }: GameShellProps) {
+export default function GameShell({
+    game,
+    level,
+    params,
+    entry,
+    catalogHref,
+}: GameShellProps) {
     const { settings } = useAccessibility();
     const isGuest = !usePage().props.auth?.user;
 
@@ -43,13 +59,17 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
     const [saveError, setSaveError] = useState(false);
 
     const elapsedNow = useCallback(() => {
-        const segment = phase === 'playing' && !paused ? Date.now() - startedAtRef.current : 0;
+        const segment =
+            phase === 'playing' && !paused
+                ? Date.now() - startedAtRef.current
+                : 0;
+
         return accumulatedRef.current + segment;
     }, [phase, paused]);
 
     const start = useCallback(() => {
         const mod = entry.createModule(params);
-        mod.init(params);
+        mod.init();
         moduleRef.current = mod;
         accumulatedRef.current = 0;
         setAnswered(0);
@@ -73,10 +93,12 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
             startedAtRef.current = Date.now();
             setRound(moduleRef.current?.renderRound() ?? null);
             setPhase('playing');
+
             return;
         }
 
         const id = setTimeout(() => setCountdown((c) => c - 1), 700);
+
         return () => clearTimeout(id);
     }, [phase, countdown]);
 
@@ -87,6 +109,7 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
         }
 
         const id = setInterval(() => setElapsed(elapsedNow()), 200);
+
         return () => clearInterval(id);
     }, [phase, paused, elapsedNow]);
 
@@ -95,17 +118,24 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
             setSaving(true);
             setSaveError(false);
 
-            postJson<{ ok: boolean; session_id: number; stats: ServerStats }>('/sessions', {
-                game_id: game.id,
-                level_id: level.id,
-                score: finalResult.score,
-                accuracy: Number(finalResult.accuracy.toFixed(2)),
-                duration_ms: finalResult.durationMs,
-                rounds: finalResult.rounds,
-                metadata: { slug: game.slug, prototype: entry.prototype ?? false },
-            })
+            postJson<{ ok: boolean; session_id: number; stats: ServerStats }>(
+                '/sessions',
+                {
+                    game_id: game.id,
+                    level_id: level.id,
+                    score: finalResult.score,
+                    accuracy: Number(finalResult.accuracy.toFixed(2)),
+                    duration_ms: finalResult.durationMs,
+                    rounds: finalResult.rounds,
+                    metadata: {
+                        slug: game.slug,
+                        prototype: entry.prototype ?? false,
+                    },
+                },
+            )
                 .then((res) => {
                     setServerStats(res.stats);
+
                     // Remember guest sessions so they can be claimed after sign-up.
                     if (isGuest && res.session_id) {
                         addGuestSession(res.session_id);
@@ -125,7 +155,10 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
             return;
         }
 
-        const finalResult: GameResult = { ...base, durationMs: accumulatedRef.current };
+        const finalResult: GameResult = {
+            ...base,
+            durationMs: accumulatedRef.current,
+        };
         setResult(finalResult);
         setElapsed(accumulatedRef.current);
         setPhase('result');
@@ -135,12 +168,14 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
     const handleAnswer = useCallback(
         (answer: unknown) => {
             const mod = moduleRef.current;
+
             if (!mod || paused) {
                 return;
             }
 
             const { correct: wasCorrect } = mod.onAnswer(answer);
             setAnswered((a) => a + 1);
+
             if (wasCorrect) {
                 setCorrect((c) => c + 1);
             }
@@ -157,10 +192,13 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
     const togglePause = useCallback(() => {
         setPaused((prev) => {
             if (!prev) {
-                accumulatedRef.current = accumulatedRef.current + (Date.now() - startedAtRef.current);
+                accumulatedRef.current =
+                    accumulatedRef.current +
+                    (Date.now() - startedAtRef.current);
             } else {
                 startedAtRef.current = Date.now();
             }
+
             return !prev;
         });
     }, []);
@@ -189,7 +227,10 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
                     >
                         Mulai
                     </button>
-                    <Link href={catalogHref} className="text-sm text-muted-foreground hover:underline">
+                    <Link
+                        href={catalogHref}
+                        className="text-sm text-muted-foreground hover:underline"
+                    >
                         Kembali ke katalog
                     </Link>
                 </div>
@@ -206,9 +247,13 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
             {phase === 'playing' && (
                 <>
                     <div className="mb-6 flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Ronde {answered + 1}</span>
+                        <span className="text-muted-foreground">
+                            Ronde {answered + 1}
+                        </span>
                         <span className="font-medium">Benar {correct}</span>
-                        <span className="text-muted-foreground tabular-nums">{seconds}s</span>
+                        <span className="text-muted-foreground tabular-nums">
+                            {seconds}s
+                        </span>
                         <button
                             type="button"
                             onClick={togglePause}
@@ -229,12 +274,20 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
                                 >
                                     Lanjutkan
                                 </button>
-                                <Link href={catalogHref} className="text-sm text-muted-foreground hover:underline">
+                                <Link
+                                    href={catalogHref}
+                                    className="text-sm text-muted-foreground hover:underline"
+                                >
                                     Keluar
                                 </Link>
                             </div>
                         ) : (
-                            round !== null && <RoundComponent round={round} onAnswer={handleAnswer} />
+                            round !== null && (
+                                <RoundComponent
+                                    round={round}
+                                    onAnswer={handleAnswer}
+                                />
+                            )
                         )}
                     </div>
                 </>
@@ -243,14 +296,24 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
             {phase === 'result' && result && (
                 <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
                     <div className="flex flex-col gap-1">
-                        <h2 className="text-2xl font-semibold">Kerja bagus! 🎉</h2>
-                        <p className="text-muted-foreground">Setiap latihan membuatmu makin tajam.</p>
+                        <h2 className="text-2xl font-semibold">
+                            Kerja bagus! 🎉
+                        </h2>
+                        <p className="text-muted-foreground">
+                            Setiap latihan membuatmu makin tajam.
+                        </p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                         <Stat label="Skor" value={String(result.score)} />
-                        <Stat label="Akurasi" value={`${result.accuracy.toFixed(0)}%`} />
-                        <Stat label="Durasi" value={`${(result.durationMs / 1000).toFixed(1)}s`} />
+                        <Stat
+                            label="Akurasi"
+                            value={`${result.accuracy.toFixed(0)}%`}
+                        />
+                        <Stat
+                            label="Durasi"
+                            value={`${(result.durationMs / 1000).toFixed(1)}s`}
+                        />
                         <Stat label="Ronde" value={String(result.rounds)} />
                     </div>
 
@@ -258,13 +321,20 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
                         <div className="flex gap-6 text-sm text-muted-foreground">
                             <span>Skor terbaik: {serverStats.best_score}</span>
                             <span>Streak: {serverStats.streak_count} hari</span>
-                            <span>Total main: {serverStats.total_sessions}</span>
+                            <span>
+                                Total main: {serverStats.total_sessions}
+                            </span>
                         </div>
                     )}
-                    {saving && <p className="text-sm text-muted-foreground">Menyimpan skor…</p>}
+                    {saving && (
+                        <p className="text-sm text-muted-foreground">
+                            Menyimpan skor…
+                        </p>
+                    )}
                     {saveError && (
                         <p className="text-sm text-muted-foreground">
-                            Skor belum tersimpan, tapi kamu tetap hebat. Coba lagi kapan saja.
+                            Skor belum tersimpan, tapi kamu tetap hebat. Coba
+                            lagi kapan saja.
                         </p>
                     )}
 
@@ -287,7 +357,9 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
             )}
 
             {/* Sound preference is read here so games can opt into audio later. */}
-            <span className="sr-only">{settings.sound ? 'suara aktif' : 'suara nonaktif'}</span>
+            <span className="sr-only">
+                {settings.sound ? 'suara aktif' : 'suara nonaktif'}
+            </span>
         </div>
     );
 }

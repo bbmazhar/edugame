@@ -126,4 +126,20 @@ export default [
             '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: false }],
         },
     },
+    {
+        // The procedural games + shared GameShell intentionally reset local UI
+        // state in effects when the active round/prop changes (and hydrate from
+        // timers, lazy-loaded modules, or localStorage). That is a valid use of
+        // effects here, so the React-Compiler set-state-in-effect heuristic is
+        // relaxed for these files only.
+        files: [
+            'resources/js/games/**/*.{ts,tsx}',
+            'resources/js/components/game-shell.tsx',
+            'resources/js/hooks/use-accessibility.tsx',
+            'resources/js/pages/play.tsx',
+        ],
+        rules: {
+            'react-hooks/set-state-in-effect': 'off',
+        },
+    },
 ];

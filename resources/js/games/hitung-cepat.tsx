@@ -1,7 +1,12 @@
-import type { GameEntry, GameModule, GameParams, GameRoundProps } from '@/types/game';
 import { useEffect, useRef, useState } from 'react';
+import type {
+    GameEntry,
+    GameModule,
+    GameParams,
+    GameRoundProps,
+} from '@/types/game';
 
-type Operation = '+' | '-' | '×' | '÷';
+export type Operation = '+' | '-' | '×' | '÷';
 
 export type HitungCepatRound = {
     text: string;
@@ -28,6 +33,7 @@ const ALL_OPERATIONS: Operation[] = ['+', '-', '×', '÷'];
 
 function toNumber(value: unknown, fallback: number): number {
     const n = Number(value);
+
     return Number.isFinite(n) ? n : fallback;
 }
 
@@ -41,9 +47,15 @@ function readSettings(params: GameParams): Settings {
     return {
         operations: ops.length > 0 ? ops : ['+', '-'],
         maxOperand: Math.max(2, Math.floor(toNumber(params.max_operand, 20))),
-        timeMs: Math.max(1000, Math.floor(toNumber(params.time_per_question_ms, 8000))),
+        timeMs: Math.max(
+            1000,
+            Math.floor(toNumber(params.time_per_question_ms, 8000)),
+        ),
         allowNegative: Boolean(params.allow_negative),
-        total: Math.min(50, Math.max(1, Math.floor(toNumber(params.total_questions, 10)))),
+        total: Math.min(
+            50,
+            Math.max(1, Math.floor(toNumber(params.total_questions, 10))),
+        ),
     };
 }
 
@@ -63,7 +75,9 @@ function buildOptions(answer: number, allowNegative: boolean): number[] {
         if (options.size >= 4) {
             break;
         }
+
         const candidate = answer + delta;
+
         if (allowNegative || candidate >= 0) {
             options.add(candidate);
         }
@@ -71,6 +85,7 @@ function buildOptions(answer: number, allowNegative: boolean): number[] {
 
     while (options.size < 4) {
         const candidate = answer + randInt(1, 12);
+
         if (allowNegative || candidate >= 0) {
             options.add(candidate);
         }
@@ -97,9 +112,11 @@ export function buildQuestion(settings: Settings): HitungCepatRound {
         case '-':
             a = randInt(1, settings.maxOperand);
             b = randInt(1, settings.maxOperand);
+
             if (!settings.allowNegative && b > a) {
                 [a, b] = [b, a];
             }
+
             answer = a - b;
             break;
         case '×':
@@ -144,11 +161,16 @@ export function createModule(
         },
         onAnswer(answer) {
             const isCorrect =
-                current !== null && !answer.timedOut && answer.value === current.answer;
+                current !== null &&
+                !answer.timedOut &&
+                answer.value === current.answer;
 
             if (isCorrect && current) {
                 correct += 1;
-                const fraction = Math.max(0, Math.min(1, answer.remainingMs / current.timeMs));
+                const fraction = Math.max(
+                    0,
+                    Math.min(1, answer.remainingMs / current.timeMs),
+                );
                 score += Math.round(100 * (0.5 + 0.5 * fraction));
             }
 
@@ -163,7 +185,8 @@ export function createModule(
         getResult() {
             return {
                 score,
-                accuracy: settings.total > 0 ? (correct / settings.total) * 100 : 0,
+                accuracy:
+                    settings.total > 0 ? (correct / settings.total) * 100 : 0,
                 rounds: settings.total,
                 durationMs: 0,
                 meta: { correct },
@@ -191,6 +214,7 @@ function Round({
 
             if (left <= 0) {
                 clearInterval(id);
+
                 if (!answeredRef.current) {
                     answeredRef.current = true;
                     onAnswer({ value: null, timedOut: true, remainingMs: 0 });
@@ -207,6 +231,7 @@ function Round({
         if (answeredRef.current || disabled) {
             return;
         }
+
         answeredRef.current = true;
         onAnswer({ value, timedOut: false, remainingMs: remaining });
     };

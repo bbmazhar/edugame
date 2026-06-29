@@ -1,10 +1,10 @@
+import { Head, Link } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 import ErrorBoundary from '@/components/error-boundary';
 import GameShell from '@/components/game-shell';
 import { resolveGame } from '@/games/registry';
 import PublicLayout from '@/layouts/public-layout';
 import type { GameEntry, GameParams } from '@/types/game';
-import { Head, Link } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
 
 type PlayProps = {
     game: {
@@ -18,7 +18,15 @@ type PlayProps = {
     params: GameParams;
 };
 
-function Notice({ title, body, catalogHref }: { title: string; body: string; catalogHref: string }) {
+function Notice({
+    title,
+    body,
+    catalogHref,
+}: {
+    title: string;
+    body: string;
+    catalogHref: string;
+}) {
     return (
         <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
             <p className="text-lg font-medium">{title}</p>
@@ -45,10 +53,14 @@ export default function Play({ game, level, params }: PlayProps) {
 
         resolveGame(game.slug)
             .then((resolved) => {
-                if (active) setEntry(resolved);
+                if (active) {
+                    setEntry(resolved);
+                }
             })
             .catch(() => {
-                if (active) setFailed(true);
+                if (active) {
+                    setFailed(true);
+                }
             });
 
         return () => {

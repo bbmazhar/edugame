@@ -210,8 +210,9 @@ html.high-contrast.dark {
 
 /* Dyslexia-friendly font */
 html.font-dyslexic {
-    --font-sans: 'Atkinson Hyperlegible', 'Comic Sans MS', ui-sans-serif,
-        system-ui, sans-serif;
+    --font-sans:
+        'Atkinson Hyperlegible', 'Comic Sans MS', ui-sans-serif, system-ui,
+        sans-serif;
 }
 
 html.font-dyslexic body {

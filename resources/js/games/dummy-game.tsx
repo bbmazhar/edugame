@@ -1,4 +1,9 @@
-import type { GameEntry, GameModule, GameParams, GameRoundProps } from '@/types/game';
+import type {
+    GameEntry,
+    GameModule,
+    GameParams,
+    GameRoundProps,
+} from '@/types/game';
 
 type DummyRound = {
     prompt: number;
@@ -7,6 +12,7 @@ type DummyRound = {
 
 function readRounds(params: GameParams): number {
     const raw = (params.rounds ?? params.total_questions ?? 5) as number;
+
     return Math.min(20, Math.max(1, Math.floor(Number(raw) || 5)));
 }
 
@@ -65,10 +71,16 @@ function createModule(params: GameParams): GameModule<DummyRound, number> {
     };
 }
 
-function Round({ round, onAnswer, disabled }: GameRoundProps<DummyRound, number>) {
+function Round({
+    round,
+    onAnswer,
+    disabled,
+}: GameRoundProps<DummyRound, number>) {
     return (
         <div className="flex flex-col items-center gap-6">
-            <p className="text-muted-foreground">Ketuk angka yang sama dengan</p>
+            <p className="text-muted-foreground">
+                Ketuk angka yang sama dengan
+            </p>
             <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-primary/10 text-5xl font-bold text-primary">
                 {round.prompt}
             </div>

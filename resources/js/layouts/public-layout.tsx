@@ -1,7 +1,7 @@
-import AccessibilityMenu from '@/components/accessibility-menu';
-import { AccessibilityProvider } from '@/hooks/use-accessibility';
 import { Link, usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
+import AccessibilityMenu from '@/components/accessibility-menu';
+import { AccessibilityProvider } from '@/hooks/use-accessibility';
 import { catalog, home, login } from '@/routes';
 /* @chisel-registration */
 import { register } from '@/routes';
@@ -76,12 +76,12 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                 <footer className="border-t border-border">
                     <div className="mx-auto w-full max-w-5xl px-6 py-6 text-sm text-muted-foreground">
                         <p>
-                            EduGame — latihan kognitif yang seru &amp; ramah fokus
-                            untuk SD, SMP, SMA, dan umum.
+                            EduGame — latihan kognitif yang seru &amp; ramah
+                            fokus untuk SD, SMP, SMA, dan umum.
                         </p>
                         <p className="mt-1 text-xs">
-                            &copy; {new Date().getFullYear()} EduGame. Bukan alat
-                            diagnosis atau pengobatan medis.
+                            &copy; {new Date().getFullYear()} EduGame. Bukan
+                            alat diagnosis atau pengobatan medis.
                         </p>
                     </div>
                 </footer>

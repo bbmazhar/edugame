@@ -11,6 +11,12 @@ const SOURCES: Record<Dictionary, string[]> = {
 /**
  * Returns the words for a dictionary whose length falls within [min, max].
  */
-export function getWords(dictionary: Dictionary, min: number, max: number): string[] {
-    return SOURCES[dictionary].filter((w) => w.length >= min && w.length <= max);
+export function getWords(
+    dictionary: Dictionary,
+    min: number,
+    max: number,
+): string[] {
+    return SOURCES[dictionary].filter(
+        (w) => w.length >= min && w.length <= max,
+    );
 }

@@ -1,27 +1,40 @@
 import { describe, expect, it } from 'vitest';
-import { createModule, readLayout, type MemoryRound } from './memory-match';
+import { createModule, readLayout } from './memory-match';
+import type { MemoryRound } from './memory-match';
 
 type Card = MemoryRound['cards'][number];
 
 function findMatch(cards: Card[]): [number, number] | null {
     const bySymbol = new Map<string, number[]>();
+
     for (const c of cards) {
-        if (c.matched) continue;
+        if (c.matched) {
+            continue;
+        }
+
         const ids = bySymbol.get(c.symbol) ?? [];
         ids.push(c.id);
         bySymbol.set(c.symbol, ids);
-        if (ids.length === 2) return [ids[0], ids[1]];
+
+        if (ids.length === 2) {
+            return [ids[0], ids[1]];
+        }
     }
+
     return null;
 }
 
 function findMismatch(cards: Card[]): [number, number] | null {
     const un = cards.filter((c) => !c.matched);
+
     for (let i = 0; i < un.length; i++) {
         for (let j = i + 1; j < un.length; j++) {
-            if (un[i].symbol !== un[j].symbol) return [un[i].id, un[j].id];
+            if (un[i].symbol !== un[j].symbol) {
+                return [un[i].id, un[j].id];
+            }
         }
     }
+
     return null;
 }
 
@@ -35,10 +48,19 @@ const params = (o: Record<string, unknown> = {}) => ({
 
 describe('memory-match layout guard', () => {
     it('always yields an even number of cards (pairs * 2)', () => {
-        expect(readLayout(params({ rows: 3, cols: 4 }))).toMatchObject({ cells: 12, pairs: 6 });
+        expect(readLayout(params({ rows: 3, cols: 4 }))).toMatchObject({
+            cells: 12,
+            pairs: 6,
+        });
         // Odd rows*cols guards down to whole pairs with a leftover cell.
-        expect(readLayout(params({ rows: 3, cols: 3 }))).toMatchObject({ cells: 9, pairs: 4 });
-        expect(readLayout(params({ rows: 5, cols: 6 }))).toMatchObject({ cells: 30, pairs: 15 });
+        expect(readLayout(params({ rows: 3, cols: 3 }))).toMatchObject({
+            cells: 9,
+            pairs: 4,
+        });
+        expect(readLayout(params({ rows: 5, cols: 6 }))).toMatchObject({
+            cells: 30,
+            pairs: 15,
+        });
     });
 
     it('clamps oversized dimensions', () => {
@@ -62,11 +84,20 @@ describe('memory-match scoring', () => {
         mod.init();
 
         let guard = 0;
+
         while (!mod.isFinished() && guard++ < 500) {
             const round = mod.renderRound();
-            if (!round) break;
+
+            if (!round) {
+                break;
+            }
+
             const pair = findMatch(round.cards);
-            if (!pair) break;
+
+            if (!pair) {
+                break;
+            }
+
             mod.onAnswer({ firstId: pair[0], secondId: pair[1] });
         }
 
@@ -88,11 +119,20 @@ describe('memory-match scoring', () => {
         }
 
         let guard = 0;
+
         while (!mod.isFinished() && guard++ < 500) {
             const round = mod.renderRound();
-            if (!round) break;
+
+            if (!round) {
+                break;
+            }
+
             const pair = findMatch(round.cards);
-            if (!pair) break;
+
+            if (!pair) {
+                break;
+            }
+
             mod.onAnswer({ firstId: pair[0], secondId: pair[1] });
         }
 
@@ -113,11 +153,20 @@ describe('memory-match scoring', () => {
         }
 
         let guard = 0;
+
         while (!mod.isFinished() && guard++ < 500) {
             const round = mod.renderRound();
-            if (!round) break;
+
+            if (!round) {
+                break;
+            }
+
             const pair = findMatch(round.cards);
-            if (!pair) break;
+
+            if (!pair) {
+                break;
+            }
+
             mod.onAnswer({ firstId: pair[0], secondId: pair[1] });
         }
 

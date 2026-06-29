@@ -1,10 +1,47 @@
-import { cn } from '@/lib/utils';
-import type { GameEntry, GameModule, GameParams, GameRoundProps } from '@/types/game';
 import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
+import type {
+    GameEntry,
+    GameModule,
+    GameParams,
+    GameRoundProps,
+} from '@/types/game';
 
 const THEMES: Record<string, string[]> = {
-    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵'],
-    fruits: ['🍎', '🍌', '🍇', '🍓', '🍊', '🍉', '🍐', '🍑', '🍒', '🥝', '🍍', '🥥', '🥭', '🍋', '🫐'],
+    animals: [
+        '🐶',
+        '🐱',
+        '🐭',
+        '🐹',
+        '🐰',
+        '🦊',
+        '🐻',
+        '🐼',
+        '🐨',
+        '🐯',
+        '🦁',
+        '🐮',
+        '🐷',
+        '🐸',
+        '🐵',
+    ],
+    fruits: [
+        '🍎',
+        '🍌',
+        '🍇',
+        '🍓',
+        '🍊',
+        '🍉',
+        '🍐',
+        '🍑',
+        '🍒',
+        '🥝',
+        '🍍',
+        '🥥',
+        '🥭',
+        '🍋',
+        '🫐',
+    ],
 };
 
 type Card = {
@@ -37,6 +74,7 @@ export type MemoryLayout = {
 
 function toNumber(value: unknown, fallback: number): number {
     const n = Number(value);
+
     return Number.isFinite(n) ? n : fallback;
 }
 
@@ -59,32 +97,41 @@ export function readLayout(params: GameParams): MemoryLayout {
         cols,
         cells,
         pairs,
-        flipBackMs: Math.max(300, Math.floor(toNumber(params.flip_back_ms, 1000))),
+        flipBackMs: Math.max(
+            300,
+            Math.floor(toNumber(params.flip_back_ms, 1000)),
+        ),
         theme: typeof params.theme === 'string' ? params.theme : 'animals',
     };
 }
 
 function shuffle<T>(items: T[]): T[] {
     const copy = [...items];
+
     for (let i = copy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [copy[i], copy[j]] = [copy[j], copy[i]];
     }
+
     return copy;
 }
 
 function buildDeck(pairs: number, theme: string): Card[] {
     const symbols = THEMES[theme] ?? THEMES.animals;
     const chosen: string[] = [];
+
     for (let i = 0; i < pairs; i++) {
         chosen.push(symbols[i % symbols.length]);
     }
 
     const deck = shuffle(chosen.flatMap((symbol) => [symbol, symbol]));
+
     return deck.map((symbol, id) => ({ id, symbol, matched: false }));
 }
 
-export function createModule(params: GameParams): GameModule<MemoryRound, MemoryAnswer> {
+export function createModule(
+    params: GameParams,
+): GameModule<MemoryRound, MemoryAnswer> {
     const layout = readLayout(params);
     let cards: Card[] = [];
     let matches = 0;
@@ -104,6 +151,7 @@ export function createModule(params: GameParams): GameModule<MemoryRound, Memory
             if (matches >= layout.pairs) {
                 return null;
             }
+
             return {
                 cards: cards.map((c) => ({ ...c })),
                 rows: layout.rows,
@@ -126,6 +174,7 @@ export function createModule(params: GameParams): GameModule<MemoryRound, Memory
                 a.matched = true;
                 b.matched = true;
                 matches += 1;
+
                 return { correct: true };
             }
 
@@ -138,7 +187,9 @@ export function createModule(params: GameParams): GameModule<MemoryRound, Memory
             const elapsedMs = startedAt > 0 ? Date.now() - startedAt : 0;
             const score = Math.max(
                 0,
-                layout.pairs * 100 - (attempts - layout.pairs) * 15 - Math.floor(elapsedMs / 1000),
+                layout.pairs * 100 -
+                    (attempts - layout.pairs) * 15 -
+                    Math.floor(elapsedMs / 1000),
             );
 
             return {
@@ -152,7 +203,11 @@ export function createModule(params: GameParams): GameModule<MemoryRound, Memory
     };
 }
 
-function MemoryBoard({ round, onAnswer, disabled }: GameRoundProps<MemoryRound, MemoryAnswer>) {
+function MemoryBoard({
+    round,
+    onAnswer,
+    disabled,
+}: GameRoundProps<MemoryRound, MemoryAnswer>) {
     const [firstId, setFirstId] = useState<number | null>(null);
     const [secondId, setSecondId] = useState<number | null>(null);
     const [locked, setLocked] = useState(false);
@@ -170,12 +225,14 @@ function MemoryBoard({ round, onAnswer, disabled }: GameRoundProps<MemoryRound, 
 
     const choose = (id: number) => {
         const card = find(id);
+
         if (disabled || locked || !card || card.matched || id === firstId) {
             return;
         }
 
         if (firstId === null) {
             setFirstId(id);
+
             return;
         }
 
@@ -208,16 +265,27 @@ function MemoryBoard({ round, onAnswer, disabled }: GameRoundProps<MemoryRound, 
 
             <div
                 className="grid w-full max-w-md gap-2"
-                style={{ gridTemplateColumns: `repeat(${round.cols}, minmax(0, 1fr))` }}
+                style={{
+                    gridTemplateColumns: `repeat(${round.cols}, minmax(0, 1fr))`,
+                }}
             >
                 {Array.from({ length: round.cells }, (_, index) => {
                     const card = round.cards[index];
 
                     if (!card) {
-                        return <div key={`blank-${index}`} aria-hidden className="aspect-square" />;
+                        return (
+                            <div
+                                key={`blank-${index}`}
+                                aria-hidden
+                                className="aspect-square"
+                            />
+                        );
                     }
 
-                    const faceUp = card.matched || card.id === firstId || card.id === secondId;
+                    const faceUp =
+                        card.matched ||
+                        card.id === firstId ||
+                        card.id === secondId;
 
                     return (
                         <button
@@ -225,7 +293,11 @@ function MemoryBoard({ round, onAnswer, disabled }: GameRoundProps<MemoryRound, 
                             type="button"
                             disabled={disabled || card.matched}
                             onClick={() => choose(card.id)}
-                            aria-label={faceUp ? `Kartu ${card.symbol}` : 'Kartu tertutup'}
+                            aria-label={
+                                faceUp
+                                    ? `Kartu ${card.symbol}`
+                                    : 'Kartu tertutup'
+                            }
                             className={cn(
                                 'flex aspect-square min-h-12 items-center justify-center rounded-lg border text-3xl transition-[transform,background-color] sm:text-4xl',
                                 faceUp

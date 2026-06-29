@@ -7,8 +7,8 @@ import {
     Puzzle,
     SpellCheck,
     TrendingUp,
-    type LucideIcon,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 const ICONS: Record<string, LucideIcon> = {
     calculator: Calculator,
@@ -54,7 +54,9 @@ export default function GameCard({
             </div>
 
             {game.description && (
-                <p className="text-sm text-muted-foreground">{game.description}</p>
+                <p className="text-sm text-muted-foreground">
+                    {game.description}
+                </p>
             )}
 
             {levelCode ? (

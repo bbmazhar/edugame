@@ -1,6 +1,6 @@
+import { Head, Link } from '@inertiajs/react';
 import PublicLayout from '@/layouts/public-layout';
 import { catalog } from '@/routes';
-import { Head, Link } from '@inertiajs/react';
 
 export default function Landing() {
     return (
@@ -17,9 +17,9 @@ export default function Landing() {
                 </h1>
 
                 <p className="max-w-2xl text-base leading-relaxed text-muted-foreground">
-                    EduGame menghadirkan kumpulan mini-game kognitif dengan ronde
-                    singkat dan tampilan yang menenangkan. Cocok untuk SD, SMP, SMA,
-                    hingga umum — main langsung tanpa perlu akun.
+                    EduGame menghadirkan kumpulan mini-game kognitif dengan
+                    ronde singkat dan tampilan yang menenangkan. Cocok untuk SD,
+                    SMP, SMA, hingga umum — main langsung tanpa perlu akun.
                 </p>
 
                 <div className="flex flex-wrap items-center gap-3">

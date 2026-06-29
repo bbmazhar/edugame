@@ -1,9 +1,18 @@
-import type { GameEntry, GameModule, GameParams, GameRoundProps } from '@/types/game';
 import { useEffect, useRef, useState } from 'react';
+import type {
+    GameEntry,
+    GameModule,
+    GameParams,
+    GameRoundProps,
+} from '@/types/game';
 
-export type ColorKey = 'merah' | 'biru' | 'hijau' | 'kuning' | 'ungu' | 'oranye';
+export type ColorKey =
+    'merah' | 'biru' | 'hijau' | 'kuning' | 'ungu' | 'oranye';
 
-export const COLORS: Record<ColorKey, { label: string; hex: string; text: string }> = {
+export const COLORS: Record<
+    ColorKey,
+    { label: string; hex: string; text: string }
+> = {
     merah: { label: 'Merah', hex: '#dc2626', text: '#ffffff' },
     biru: { label: 'Biru', hex: '#2563eb', text: '#ffffff' },
     hijau: { label: 'Hijau', hex: '#16a34a', text: '#ffffff' },
@@ -37,18 +46,25 @@ type Settings = {
 
 function toNumber(value: unknown, fallback: number): number {
     const n = Number(value);
+
     return Number.isFinite(n) ? n : fallback;
 }
 
 function readSettings(params: GameParams): Settings {
     return {
         displayMs: Math.max(800, Math.floor(toNumber(params.display_ms, 3000))),
-        congruentRatio: Math.min(1, Math.max(0, toNumber(params.congruent_ratio, 0.5))),
+        congruentRatio: Math.min(
+            1,
+            Math.max(0, toNumber(params.congruent_ratio, 0.5)),
+        ),
         distractorCount: Math.min(
             KEYS.length - 1,
             Math.max(1, Math.floor(toNumber(params.distractor_count, 2))),
         ),
-        rounds: Math.min(50, Math.max(1, Math.floor(toNumber(params.rounds, 10)))),
+        rounds: Math.min(
+            50,
+            Math.max(1, Math.floor(toNumber(params.rounds, 10))),
+        ),
     };
 }
 
@@ -66,12 +82,14 @@ export function buildRound(settings: Settings): FokusWarnaRound {
     const wordKey = congruent ? inkKey : pick(KEYS.filter((k) => k !== inkKey));
 
     const options = new Set<ColorKey>([inkKey]);
+
     // On incongruent rounds, the word's colour is the classic tempting trap.
     if (!congruent) {
         options.add(wordKey);
     }
 
     const pool = shuffle(KEYS.filter((k) => !options.has(k)));
+
     while (options.size < settings.distractorCount + 1 && pool.length > 0) {
         options.add(pool.pop() as ColorKey);
     }
@@ -110,12 +128,17 @@ export function createModule(
         },
         onAnswer(answer) {
             const isCorrect =
-                current !== null && !answer.timedOut && answer.value === current.inkKey;
+                current !== null &&
+                !answer.timedOut &&
+                answer.value === current.inkKey;
 
             if (current) {
                 if (isCorrect) {
                     correct += 1;
-                    const fraction = Math.max(0, Math.min(1, answer.remainingMs / current.timeMs));
+                    const fraction = Math.max(
+                        0,
+                        Math.min(1, answer.remainingMs / current.timeMs),
+                    );
                     score += Math.round(100 * (0.5 + 0.5 * fraction));
                     reactionSum += current.timeMs - answer.remainingMs;
                     reactionCount += 1;
@@ -136,12 +159,16 @@ export function createModule(
         getResult() {
             return {
                 score: Math.max(0, score),
-                accuracy: settings.rounds > 0 ? (correct / settings.rounds) * 100 : 0,
+                accuracy:
+                    settings.rounds > 0 ? (correct / settings.rounds) * 100 : 0,
                 rounds: settings.rounds,
                 durationMs: 0,
                 meta: {
                     correct,
-                    avgReactionMs: reactionCount > 0 ? Math.round(reactionSum / reactionCount) : null,
+                    avgReactionMs:
+                        reactionCount > 0
+                            ? Math.round(reactionSum / reactionCount)
+                            : null,
                 },
             };
         },
@@ -167,6 +194,7 @@ function Round({
 
             if (left <= 0) {
                 clearInterval(id);
+
                 if (!answeredRef.current) {
                     answeredRef.current = true;
                     onAnswer({ value: null, timedOut: true, remainingMs: 0 });
@@ -182,6 +210,7 @@ function Round({
         if (answeredRef.current || disabled) {
             return;
         }
+
         answeredRef.current = true;
         onAnswer({ value, timedOut: false, remainingMs: remaining });
     };
@@ -191,7 +220,11 @@ function Round({
     return (
         <div className="flex w-full flex-col items-center gap-6">
             <div className="h-2 w-full max-w-sm overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} aria-hidden />
+                <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${pct}%` }}
+                    aria-hidden
+                />
             </div>
 
             <p className="text-sm text-muted-foreground">
@@ -213,7 +246,10 @@ function Round({
                         disabled={disabled}
                         onClick={() => choose(key)}
                         aria-label={`Pilih warna ${COLORS[key].label}`}
-                        style={{ backgroundColor: COLORS[key].hex, color: COLORS[key].text }}
+                        style={{
+                            backgroundColor: COLORS[key].hex,
+                            color: COLORS[key].text,
+                        }}
                         className="flex min-h-16 min-w-24 items-center justify-center rounded-xl border border-black/10 text-lg font-semibold disabled:opacity-50"
                     >
                         {COLORS[key].label}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { PAD_COUNT, createModule, readSettings, type SimonRound } from './ingat-urutan';
+import { PAD_COUNT, createModule, readSettings } from './ingat-urutan';
+import type { SimonRound } from './ingat-urutan';
 
 const params = (o: Record<string, unknown> = {}) => ({
     start_length: 3,
@@ -10,14 +11,22 @@ const params = (o: Record<string, unknown> = {}) => ({
     ...o,
 });
 
-function play(p: Record<string, unknown>, decide: (round: SimonRound) => boolean) {
+function play(
+    p: Record<string, unknown>,
+    decide: (round: SimonRound) => boolean,
+) {
     const mod = createModule(p);
     mod.init();
 
     let guard = 0;
+
     while (!mod.isFinished() && guard++ < 100) {
         const round = mod.renderRound();
-        if (!round) break;
+
+        if (!round) {
+            break;
+        }
+
         mod.onAnswer({ success: decide(round) });
     }
 
@@ -26,13 +35,21 @@ function play(p: Record<string, unknown>, decide: (round: SimonRound) => boolean
 
 describe('ingat-urutan settings', () => {
     it('normalises an unknown modality to color', () => {
-        expect(readSettings(params({ modality: 'sparkle' })).modality).toBe('color');
-        expect(readSettings(params({ modality: 'number' })).modality).toBe('number');
-        expect(readSettings(params({ modality: 'sound' })).modality).toBe('sound');
+        expect(readSettings(params({ modality: 'sparkle' })).modality).toBe(
+            'color',
+        );
+        expect(readSettings(params({ modality: 'number' })).modality).toBe(
+            'number',
+        );
+        expect(readSettings(params({ modality: 'sound' })).modality).toBe(
+            'sound',
+        );
     });
 
     it('keeps max_length no smaller than start_length', () => {
-        expect(readSettings(params({ start_length: 5, max_length: 2 })).maxLength).toBe(5);
+        expect(
+            readSettings(params({ start_length: 5, max_length: 2 })).maxLength,
+        ).toBe(5);
     });
 });
 
@@ -54,9 +71,14 @@ describe('ingat-urutan sequence', () => {
         const lengths: number[] = [];
 
         let guard = 0;
+
         while (!mod.isFinished() && guard++ < 100) {
             const round = mod.renderRound();
-            if (!round) break;
+
+            if (!round) {
+                break;
+            }
+
             lengths.push(round.currentLength);
             mod.onAnswer({ success: true });
         }

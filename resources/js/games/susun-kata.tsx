@@ -1,7 +1,13 @@
-import { cn } from '@/lib/utils';
-import type { GameEntry, GameModule, GameParams, GameRoundProps } from '@/types/game';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getWords, type Dictionary } from './wordlists';
+import { cn } from '@/lib/utils';
+import type {
+    GameEntry,
+    GameModule,
+    GameParams,
+    GameRoundProps,
+} from '@/types/game';
+import { getWords } from './wordlists';
+import type { Dictionary } from './wordlists';
 
 type Cell = { r: number; c: number };
 type Placement = { word: string; cells: Cell[] };
@@ -45,15 +51,26 @@ export type SusunSettings = {
 
 function toNumber(value: unknown, fallback: number): number {
     const n = Number(value);
+
     return Number.isFinite(n) ? n : fallback;
 }
 
 export function readSettings(params: GameParams): SusunSettings {
     const mode = params.mode === 'search' ? 'search' : 'anagram';
     const dictionary: Dictionary = params.dictionary === 'en' ? 'en' : 'id';
-    const minLen = Math.min(12, Math.max(2, Math.floor(toNumber(params.min_len, 3))));
-    const maxLen = Math.max(minLen, Math.floor(toNumber(params.max_len, minLen)));
-    let gridSize = Math.min(14, Math.max(4, Math.floor(toNumber(params.grid_size, 8))));
+    const minLen = Math.min(
+        12,
+        Math.max(2, Math.floor(toNumber(params.min_len, 3))),
+    );
+    const maxLen = Math.max(
+        minLen,
+        Math.floor(toNumber(params.max_len, minLen)),
+    );
+    let gridSize = Math.min(
+        14,
+        Math.max(4, Math.floor(toNumber(params.grid_size, 8))),
+    );
+
     if (mode === 'search') {
         gridSize = Math.max(gridSize, maxLen);
     }
@@ -74,22 +91,30 @@ function randInt(min: number, max: number): number {
 
 function shuffle<T>(items: T[]): T[] {
     const copy = [...items];
+
     for (let i = copy.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [copy[i], copy[j]] = [copy[j], copy[i]];
     }
+
     return copy;
 }
 
 const sortedKey = (word: string) => word.split('').sort().join('');
 
-export function buildAnagram(words: string[]): { letters: string[]; answers: string[] } {
+export function buildAnagram(words: string[]): {
+    letters: string[];
+    answers: string[];
+} {
     const target = words[Math.floor(Math.random() * words.length)];
     const key = sortedKey(target);
-    const answers = words.filter((w) => w.length === target.length && sortedKey(w) === key);
+    const answers = words.filter(
+        (w) => w.length === target.length && sortedKey(w) === key,
+    );
 
     let letters = target.split('');
     let tries = 0;
+
     do {
         letters = shuffle(target.split(''));
         tries += 1;
@@ -117,16 +142,23 @@ export function buildSearch(
 ): { grid: string[][]; placements: Placement[] } {
     const pool = shuffle(words.filter((w) => w.length <= size));
     const target = Math.min(8, Math.max(4, size - 3));
-    const grid: (string | null)[][] = Array.from({ length: size }, () => Array(size).fill(null));
+    const grid: (string | null)[][] = Array.from({ length: size }, () =>
+        Array(size).fill(null),
+    );
     const placements: Placement[] = [];
 
     for (const raw of pool) {
-        if (placements.length >= target) break;
+        if (placements.length >= target) {
+            break;
+        }
+
         const word = raw.toUpperCase();
 
         let placed = false;
+
         for (let attempt = 0; attempt < 50 && !placed; attempt++) {
-            const [dr, dc] = DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
+            const [dr, dc] =
+                DIRECTIONS[Math.floor(Math.random() * DIRECTIONS.length)];
             const r0 = randInt(0, size - 1);
             const c0 = randInt(0, size - 1);
             const cells: Cell[] = [];
@@ -135,15 +167,19 @@ export function buildSearch(
             for (let i = 0; i < word.length; i++) {
                 const r = r0 + dr * i;
                 const c = c0 + dc * i;
+
                 if (r < 0 || r >= size || c < 0 || c >= size) {
                     ok = false;
                     break;
                 }
+
                 const existing = grid[r][c];
+
                 if (existing !== null && existing !== word[i]) {
                     ok = false;
                     break;
                 }
+
                 cells.push({ r, c });
             }
 
@@ -173,21 +209,40 @@ export function verifyGrid(grid: string[][], placements: Placement[]): boolean {
     const size = grid.length;
 
     for (const p of placements) {
-        if (p.cells.length !== p.word.length || p.cells.length === 0) return false;
+        if (p.cells.length !== p.word.length || p.cells.length === 0) {
+            return false;
+        }
 
         for (let i = 0; i < p.cells.length; i++) {
             const { r, c } = p.cells[i];
-            if (r < 0 || r >= size || c < 0 || c >= grid[r].length) return false;
-            if (grid[r][c] !== p.word[i]) return false;
+
+            if (r < 0 || r >= size || c < 0 || c >= grid[r].length) {
+                return false;
+            }
+
+            if (grid[r][c] !== p.word[i]) {
+                return false;
+            }
 
             if (i > 0) {
                 const dr = p.cells[i].r - p.cells[i - 1].r;
                 const dc = p.cells[i].c - p.cells[i - 1].c;
-                if (Math.abs(dr) > 1 || Math.abs(dc) > 1 || (dr === 0 && dc === 0)) return false;
+
+                if (
+                    Math.abs(dr) > 1 ||
+                    Math.abs(dc) > 1 ||
+                    (dr === 0 && dc === 0)
+                ) {
+                    return false;
+                }
+
                 if (i > 1) {
                     const pdr = p.cells[i - 1].r - p.cells[i - 2].r;
                     const pdc = p.cells[i - 1].c - p.cells[i - 2].c;
-                    if (dr !== pdr || dc !== pdc) return false;
+
+                    if (dr !== pdr || dc !== pdc) {
+                        return false;
+                    }
                 }
             }
         }
@@ -196,9 +251,15 @@ export function verifyGrid(grid: string[][], placements: Placement[]): boolean {
     return true;
 }
 
-export function createModule(params: GameParams): GameModule<SusunRound, SusunAnswer> {
+export function createModule(
+    params: GameParams,
+): GameModule<SusunRound, SusunAnswer> {
     const settings = readSettings(params);
-    const words = getWords(settings.dictionary, settings.minLen, settings.maxLen);
+    const words = getWords(
+        settings.dictionary,
+        settings.minLen,
+        settings.maxLen,
+    );
 
     let score = 0;
     let wordsFound = 0;
@@ -221,7 +282,10 @@ export function createModule(params: GameParams): GameModule<SusunRound, SusunAn
                 puzzleId = 0;
             },
             renderRound() {
-                if (finished) return null;
+                if (finished) {
+                    return null;
+                }
+
                 return {
                     mode: 'anagram',
                     letters: [...puzzle.letters],
@@ -234,26 +298,33 @@ export function createModule(params: GameParams): GameModule<SusunRound, SusunAn
             onAnswer(answer) {
                 if (answer.type === 'timeup') {
                     finished = true;
+
                     return { correct: false };
                 }
+
                 if (answer.type === 'skip') {
                     puzzle = buildAnagram(words);
                     answerSet = new Set(puzzle.answers);
                     puzzleId += 1;
+
                     return { correct: false };
                 }
+
                 if (answer.type === 'word') {
                     attempts += 1;
                     const w = answer.word.toLowerCase();
+
                     if (answerSet.has(w)) {
                         score += w.length;
                         wordsFound += 1;
                         puzzle = buildAnagram(words);
                         answerSet = new Set(puzzle.answers);
                         puzzleId += 1;
+
                         return { correct: true };
                     }
                 }
+
                 return { correct: false };
             },
             isFinished() {
@@ -284,7 +355,10 @@ export function createModule(params: GameParams): GameModule<SusunRound, SusunAn
             found.clear();
         },
         renderRound() {
-            if (finished) return null;
+            if (finished) {
+                return null;
+            }
+
             return {
                 mode: 'search',
                 grid: board.grid,
@@ -299,21 +373,27 @@ export function createModule(params: GameParams): GameModule<SusunRound, SusunAn
         onAnswer(answer) {
             if (answer.type === 'timeup') {
                 finished = true;
+
                 return { correct: false };
             }
+
             if (answer.type === 'find') {
                 attempts += 1;
                 const w = answer.word.toUpperCase();
+
                 if (targetWords.has(w) && !found.has(w)) {
                     found.set(w, answer.cells ?? []);
                     score += w.length;
                     wordsFound += 1;
+
                     if (found.size === targetWords.size) {
                         finished = true;
                     }
+
                     return { correct: true };
                 }
             }
+
             return { correct: false };
         },
         isFinished() {
@@ -352,14 +432,19 @@ function AnagramBoard({
     const word = used.map((i) => round.letters[i]).join('');
 
     const submit = () => {
-        if (!complete || disabled) return;
+        if (!complete || disabled) {
+            return;
+        }
+
         onSubmit(word);
         setUsed([]);
     };
 
     return (
         <div className="flex w-full flex-col items-center gap-4">
-            <p className="text-sm text-muted-foreground">Susun semua huruf menjadi kata</p>
+            <p className="text-sm text-muted-foreground">
+                Susun semua huruf menjadi kata
+            </p>
 
             <div className="flex min-h-14 min-w-48 items-center justify-center gap-2 rounded-lg border border-border bg-card px-4">
                 {used.length > 0 ? (
@@ -379,7 +464,9 @@ function AnagramBoard({
                         key={i}
                         type="button"
                         disabled={disabled || used.includes(i)}
-                        onClick={() => setUsed((u) => (u.includes(i) ? u : [...u, i]))}
+                        onClick={() =>
+                            setUsed((u) => (u.includes(i) ? u : [...u, i]))
+                        }
                         className="min-h-14 min-w-14 rounded-xl border border-border bg-card text-2xl font-bold hover:bg-accent disabled:opacity-30"
                     >
                         {ch}
@@ -414,7 +501,9 @@ function AnagramBoard({
                 </button>
             </div>
 
-            <p className="text-xs text-muted-foreground">Kata ditemukan: {round.wordsFound}</p>
+            <p className="text-xs text-muted-foreground">
+                Kata ditemukan: {round.wordsFound}
+            </p>
         </div>
     );
 }
@@ -436,24 +525,42 @@ function SearchBoard({
     );
 
     const lineCells = (a: Cell, b: Cell): Cell[] | null => {
-        const straight = a.r === b.r || a.c === b.c || Math.abs(b.r - a.r) === Math.abs(b.c - a.c);
-        if (!straight) return null;
+        const straight =
+            a.r === b.r ||
+            a.c === b.c ||
+            Math.abs(b.r - a.r) === Math.abs(b.c - a.c);
+
+        if (!straight) {
+            return null;
+        }
+
         const dr = Math.sign(b.r - a.r);
         const dc = Math.sign(b.c - a.c);
         const len = Math.max(Math.abs(b.r - a.r), Math.abs(b.c - a.c)) + 1;
-        return Array.from({ length: len }, (_, i) => ({ r: a.r + dr * i, c: a.c + dc * i }));
+
+        return Array.from({ length: len }, (_, i) => ({
+            r: a.r + dr * i,
+            c: a.c + dc * i,
+        }));
     };
 
     const tap = (r: number, c: number) => {
-        if (disabled) return;
+        if (disabled) {
+            return;
+        }
+
         if (!first) {
             setFirst({ r, c });
+
             return;
         }
 
         const cells = lineCells(first, { r, c });
         setFirst(null);
-        if (!cells) return;
+
+        if (!cells) {
+            return;
+        }
 
         const str = cells.map((p) => round.grid[p.r][p.c]).join('');
         const reversed = [...str].reverse().join('');
@@ -469,7 +576,9 @@ function SearchBoard({
         <div className="flex w-full flex-col items-center gap-4">
             <div
                 className="grid w-full max-w-md gap-1"
-                style={{ gridTemplateColumns: `repeat(${round.size}, minmax(0, 1fr))` }}
+                style={{
+                    gridTemplateColumns: `repeat(${round.size}, minmax(0, 1fr))`,
+                }}
             >
                 {round.grid.map((row, r) =>
                     row.map((ch, c) => {
@@ -519,7 +628,11 @@ function SearchBoard({
     );
 }
 
-function SusunKataBoard({ round, onAnswer, disabled }: GameRoundProps<SusunRound, SusunAnswer>) {
+function SusunKataBoard({
+    round,
+    onAnswer,
+    disabled,
+}: GameRoundProps<SusunRound, SusunAnswer>) {
     const [remaining, setRemaining] = useState(round.timeMs);
     const firedRef = useRef(false);
 
@@ -531,8 +644,10 @@ function SusunKataBoard({ round, onAnswer, disabled }: GameRoundProps<SusunRound
         const id = setInterval(() => {
             const left = Math.max(0, round.timeMs - (Date.now() - start));
             setRemaining(left);
+
             if (left <= 0) {
                 clearInterval(id);
+
                 if (!firedRef.current) {
                     firedRef.current = true;
                     onAnswer({ type: 'timeup' });
@@ -550,7 +665,11 @@ function SusunKataBoard({ round, onAnswer, disabled }: GameRoundProps<SusunRound
     return (
         <div className="flex w-full flex-col items-center gap-5">
             <div className="h-2 w-full max-w-sm overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} aria-hidden />
+                <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: `${pct}%` }}
+                    aria-hidden
+                />
             </div>
             <p className="text-xs text-muted-foreground">
                 {Math.ceil(remaining / 1000)} detik · Skor {round.score}
@@ -567,7 +686,9 @@ function SusunKataBoard({ round, onAnswer, disabled }: GameRoundProps<SusunRound
                 <SearchBoard
                     round={round}
                     disabled={disabled}
-                    onFind={(word, cells) => onAnswer({ type: 'find', word, cells })}
+                    onFind={(word, cells) =>
+                        onAnswer({ type: 'find', word, cells })
+                    }
                 />
             )}
         </div>

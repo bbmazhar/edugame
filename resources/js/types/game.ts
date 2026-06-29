@@ -16,7 +16,7 @@ export type GameResult = {
  * measures and overrides elapsed time.
  */
 export type GameModule<TRound = unknown, TAnswer = unknown> = {
-    init(params: GameParams): void;
+    init(): void;
     renderRound(): TRound | null;
     onAnswer(answer: TAnswer): { correct: boolean };
     isFinished(): boolean;

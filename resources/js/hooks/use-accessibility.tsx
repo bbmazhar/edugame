@@ -5,8 +5,8 @@ import {
     useContext,
     useEffect,
     useState,
-    type PropsWithChildren,
 } from 'react';
+import type { PropsWithChildren } from 'react';
 import type { AccessibilitySettings } from '@/types/ui';
 
 const STORAGE_KEY = 'accessibility';
@@ -26,6 +26,7 @@ const readLocal = (): Partial<AccessibilitySettings> => {
 
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
+
         return raw ? (JSON.parse(raw) as Partial<AccessibilitySettings>) : {};
     } catch {
         return {};
@@ -66,21 +67,30 @@ type AccessibilityContextValue = {
     update: (partial: Partial<AccessibilitySettings>) => void;
 };
 
-const AccessibilityContext = createContext<AccessibilityContextValue | null>(null);
+const AccessibilityContext = createContext<AccessibilityContextValue | null>(
+    null,
+);
 
 export function AccessibilityProvider({ children }: PropsWithChildren) {
     const page = usePage().props;
     const isAuthenticated = Boolean(page.auth?.user);
     const serverSettings = page.accessibility;
 
-    const [settings, setSettings] = useState<AccessibilitySettings>(DEFAULT_ACCESSIBILITY);
+    const [settings, setSettings] = useState<AccessibilitySettings>(
+        DEFAULT_ACCESSIBILITY,
+    );
 
     // Reconcile on mount: for guests, localStorage wins; for authenticated
     // users, the server-stored profile is the source of truth.
     useEffect(() => {
-        const initial: AccessibilitySettings = isAuthenticated && serverSettings
-            ? { ...DEFAULT_ACCESSIBILITY, ...readLocal(), ...serverSettings }
-            : { ...DEFAULT_ACCESSIBILITY, ...readLocal() };
+        const initial: AccessibilitySettings =
+            isAuthenticated && serverSettings
+                ? {
+                      ...DEFAULT_ACCESSIBILITY,
+                      ...readLocal(),
+                      ...serverSettings,
+                  }
+                : { ...DEFAULT_ACCESSIBILITY, ...readLocal() };
 
         setSettings(initial);
         applyClasses(initial);
@@ -120,7 +130,9 @@ export function useAccessibility(): AccessibilityContextValue {
     const context = useContext(AccessibilityContext);
 
     if (!context) {
-        throw new Error('useAccessibility must be used within an AccessibilityProvider');
+        throw new Error(
+            'useAccessibility must be used within an AccessibilityProvider',
+        );
     }
 
     return context;

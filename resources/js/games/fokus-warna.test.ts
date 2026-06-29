@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import {
-    buildRound,
-    createModule,
-    type FokusWarnaAnswer,
-    type FokusWarnaRound,
-} from './fokus-warna';
+import { buildRound, createModule } from './fokus-warna';
+import type { FokusWarnaAnswer, FokusWarnaRound } from './fokus-warna';
 
-const settings = (overrides: Partial<Parameters<typeof buildRound>[0]> = {}) => ({
+const settings = (
+    overrides: Partial<Parameters<typeof buildRound>[0]> = {},
+) => ({
     displayMs: 3000,
     congruentRatio: 0.5,
     distractorCount: 2,
@@ -22,11 +20,14 @@ function playAll(
     mod.init();
 
     let guard = 0;
+
     while (!mod.isFinished() && guard++ < 200) {
         const round = mod.renderRound();
+
         if (!round) {
             break;
         }
+
         mod.onAnswer(answerFor(round));
     }
 
@@ -110,7 +111,9 @@ describe('fokus-warna scoring (correct − penalty, reaction measured)', () => {
             remainingMs: round.timeMs - 500,
         }));
 
-        expect((result.meta as { avgReactionMs: number }).avgReactionMs).toBe(500);
+        expect((result.meta as { avgReactionMs: number }).avgReactionMs).toBe(
+            500,
+        );
     });
 
     it('clamps rounds into a sane range', () => {

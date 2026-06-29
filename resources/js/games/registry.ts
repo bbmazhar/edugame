@@ -19,5 +19,6 @@ const loaders: Record<string, Loader> = {
 export async function resolveGame(slug: string): Promise<GameEntry> {
     const loader = loaders[slug] ?? (() => import('./dummy-game'));
     const mod = (await loader()) as { default: GameEntry };
+
     return mod.default;
 }

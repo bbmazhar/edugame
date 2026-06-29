@@ -1,7 +1,7 @@
+import { Accessibility } from 'lucide-react';
 import { useAccessibility } from '@/hooks/use-accessibility';
 import { cn } from '@/lib/utils';
 import type { AccessibilitySettings } from '@/types/ui';
-import { Accessibility } from 'lucide-react';
 
 function ToggleRow({
     label,
@@ -93,12 +93,16 @@ export default function AccessibilityMenu() {
                 <ToggleRow
                     label="Kurangi animasi"
                     checked={settings.reduced_motion}
-                    onChange={() => update({ reduced_motion: !settings.reduced_motion })}
+                    onChange={() =>
+                        update({ reduced_motion: !settings.reduced_motion })
+                    }
                 />
                 <ToggleRow
                     label="Kontras tinggi"
                     checked={settings.high_contrast}
-                    onChange={() => update({ high_contrast: !settings.high_contrast })}
+                    onChange={() =>
+                        update({ high_contrast: !settings.high_contrast })
+                    }
                 />
                 <ToggleRow
                     label="Suara"

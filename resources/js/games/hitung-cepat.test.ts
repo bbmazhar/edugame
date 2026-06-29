@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { buildQuestion, createModule, type HitungCepatRound } from './hitung-cepat';
+import { buildQuestion, createModule } from './hitung-cepat';
+import type { HitungCepatRound, Operation } from './hitung-cepat';
 
-const settings = (overrides: Partial<Parameters<typeof buildQuestion>[0]> = {}) => ({
-    operations: ['+'] as const,
+const settings = (
+    overrides: Partial<Parameters<typeof buildQuestion>[0]> = {},
+) => ({
+    operations: ['+'] as Operation[],
     maxOperand: 10,
     timeMs: 5000,
     allowNegative: false,
@@ -12,17 +15,24 @@ const settings = (overrides: Partial<Parameters<typeof buildQuestion>[0]> = {}) 
 
 function playAll(
     params: Record<string, unknown>,
-    answerFor: (round: HitungCepatRound) => { value: number | null; timedOut: boolean; remainingMs: number },
+    answerFor: (round: HitungCepatRound) => {
+        value: number | null;
+        timedOut: boolean;
+        remainingMs: number;
+    },
 ) {
     const mod = createModule(params);
     mod.init();
 
     let guard = 0;
+
     while (!mod.isFinished() && guard++ < 200) {
         const round = mod.renderRound();
+
         if (!round) {
             break;
         }
+
         mod.onAnswer(answerFor(round));
     }
 
@@ -32,7 +42,9 @@ function playAll(
 describe('hitung-cepat question generation', () => {
     it('division questions always have an integer quotient', () => {
         for (let i = 0; i < 300; i++) {
-            const q = buildQuestion(settings({ operations: ['÷'], maxOperand: 12 }));
+            const q = buildQuestion(
+                settings({ operations: ['÷'], maxOperand: 12 }),
+            );
             const [a, , b] = q.text.split(' ');
             expect(Number(a) % Number(b)).toBe(0);
             expect(Number(a) / Number(b)).toBe(q.answer);
@@ -41,7 +53,9 @@ describe('hitung-cepat question generation', () => {
 
     it('never produces negative results or options when allowNegative is false', () => {
         for (let i = 0; i < 300; i++) {
-            const q = buildQuestion(settings({ operations: ['-'], maxOperand: 20 }));
+            const q = buildQuestion(
+                settings({ operations: ['-'], maxOperand: 20 }),
+            );
             expect(q.answer).toBeGreaterThanOrEqual(0);
             q.options.forEach((o) => expect(o).toBeGreaterThanOrEqual(0));
         }
@@ -49,7 +63,13 @@ describe('hitung-cepat question generation', () => {
 
     it('always offers four unique options that include the answer', () => {
         for (let i = 0; i < 200; i++) {
-            const q = buildQuestion(settings({ operations: ['+', '-', '×', '÷'], maxOperand: 50, allowNegative: true }));
+            const q = buildQuestion(
+                settings({
+                    operations: ['+', '-', '×', '÷'],
+                    maxOperand: 50,
+                    allowNegative: true,
+                }),
+            );
             expect(q.options).toHaveLength(4);
             expect(new Set(q.options).size).toBe(4);
             expect(q.options).toContain(q.answer);
@@ -91,11 +111,14 @@ describe('hitung-cepat scoring', () => {
     });
 
     it('clamps total_questions into a sane range', () => {
-        const result = playAll({ ...params, total_questions: 999 }, (round) => ({
-            value: round.answer,
-            timedOut: false,
-            remainingMs: round.timeMs,
-        }));
+        const result = playAll(
+            { ...params, total_questions: 999 },
+            (round) => ({
+                value: round.answer,
+                timedOut: false,
+                remainingMs: round.timeMs,
+            }),
+        );
 
         expect(result.rounds).toBe(50);
     });
