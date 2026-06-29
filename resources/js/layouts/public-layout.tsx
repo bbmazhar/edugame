@@ -2,7 +2,7 @@ import AccessibilityMenu from '@/components/accessibility-menu';
 import { AccessibilityProvider } from '@/hooks/use-accessibility';
 import { Link, usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
-import { catalog, dashboard, home, login } from '@/routes';
+import { catalog, home, login } from '@/routes';
 /* @chisel-registration */
 import { register } from '@/routes';
 /* @end-chisel-registration */
@@ -42,10 +42,10 @@ export default function PublicLayout({ children }: PropsWithChildren) {
                             <AccessibilityMenu />
                             {auth.user ? (
                                 <Link
-                                    href={dashboard()}
+                                    href="/profil"
                                     className="min-h-11 rounded-md border border-border px-4 py-1.5 hover:bg-accent"
                                 >
-                                    Dashboard
+                                    Profil
                                 </Link>
                             ) : (
                                 <>

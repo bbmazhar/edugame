@@ -1,7 +1,8 @@
 import { useAccessibility } from '@/hooks/use-accessibility';
 import { postJson } from '@/lib/csrf';
+import { addGuestSession } from '@/lib/guest-progress';
 import type { GameEntry, GameModule, GameParams, GameResult } from '@/types/game';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Phase = 'intro' | 'countdown' | 'playing' | 'result';
@@ -22,6 +23,7 @@ type GameShellProps = {
 
 export default function GameShell({ game, level, params, entry, catalogHref }: GameShellProps) {
     const { settings } = useAccessibility();
+    const isGuest = !usePage().props.auth?.user;
 
     const moduleRef = useRef<GameModule | null>(null);
     const startedAtRef = useRef<number>(0);
@@ -93,7 +95,7 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
             setSaving(true);
             setSaveError(false);
 
-            postJson<{ ok: boolean; stats: ServerStats }>('/sessions', {
+            postJson<{ ok: boolean; session_id: number; stats: ServerStats }>('/sessions', {
                 game_id: game.id,
                 level_id: level.id,
                 score: finalResult.score,
@@ -102,11 +104,17 @@ export default function GameShell({ game, level, params, entry, catalogHref }: G
                 rounds: finalResult.rounds,
                 metadata: { slug: game.slug, prototype: entry.prototype ?? false },
             })
-                .then((res) => setServerStats(res.stats))
+                .then((res) => {
+                    setServerStats(res.stats);
+                    // Remember guest sessions so they can be claimed after sign-up.
+                    if (isGuest && res.session_id) {
+                        addGuestSession(res.session_id);
+                    }
+                })
                 .catch(() => setSaveError(true))
                 .finally(() => setSaving(false));
         },
-        [game.id, game.slug, level.id, entry.prototype],
+        [game.id, game.slug, level.id, entry.prototype, isGuest],
     );
 
     const finish = useCallback(() => {
