@@ -1,5 +1,6 @@
 import type { GameEntry } from '@/types/game';
 import dummyGame from './dummy-game';
+import fokusWarna from './fokus-warna';
 import hitungCepat from './hitung-cepat';
 
 /**
@@ -9,6 +10,7 @@ import hitungCepat from './hitung-cepat';
  */
 const registry: Record<string, GameEntry> = {
     'hitung-cepat': hitungCepat as GameEntry,
+    'fokus-warna': fokusWarna as GameEntry,
 };
 
 export function resolveGame(slug: string): GameEntry {
