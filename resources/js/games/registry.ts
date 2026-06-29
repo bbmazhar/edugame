@@ -2,6 +2,7 @@ import type { GameEntry } from '@/types/game';
 import dummyGame from './dummy-game';
 import fokusWarna from './fokus-warna';
 import hitungCepat from './hitung-cepat';
+import memoryMatch from './memory-match';
 
 /**
  * Maps a game slug to its implementation. Real games are registered here in
@@ -11,6 +12,7 @@ import hitungCepat from './hitung-cepat';
 const registry: Record<string, GameEntry> = {
     'hitung-cepat': hitungCepat as GameEntry,
     'fokus-warna': fokusWarna as GameEntry,
+    'memory-match': memoryMatch as GameEntry,
 };
 
 export function resolveGame(slug: string): GameEntry {
