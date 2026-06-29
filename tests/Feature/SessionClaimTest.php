@@ -6,6 +6,7 @@ use App\Models\Game;
 use App\Models\GameSession;
 use App\Models\Level;
 use App\Models\User;
+use Database\Seeders\GameConfigSeeder;
 use Database\Seeders\GameSeeder;
 use Database\Seeders\LevelSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,7 +19,7 @@ class SessionClaimTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed([LevelSeeder::class, GameSeeder::class]);
+        $this->seed([LevelSeeder::class, GameSeeder::class, GameConfigSeeder::class]);
     }
 
     private function guestSession(Game $game, Level $level, int $score, ?int $userId = null): GameSession

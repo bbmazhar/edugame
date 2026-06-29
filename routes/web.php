@@ -10,11 +10,15 @@ Route::inertia('/', 'landing')->name('home');
 
 Route::get('katalog', [CatalogController::class, 'index'])->name('catalog');
 Route::get('main/{game:slug}', [GameController::class, 'show'])->name('play');
-Route::post('sessions', [SessionController::class, 'store'])->name('sessions.store');
+Route::post('sessions', [SessionController::class, 'store'])
+    ->middleware('throttle:30,1')
+    ->name('sessions.store');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('profil', [PlayerProfileController::class, 'show'])->name('profile.show');
-    Route::post('sessions/claim', [SessionController::class, 'claim'])->name('sessions.claim');
+    Route::post('sessions/claim', [SessionController::class, 'claim'])
+        ->middleware('throttle:20,1')
+        ->name('sessions.claim');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
