@@ -2,6 +2,7 @@ import type { GameEntry } from '@/types/game';
 import dummyGame from './dummy-game';
 import fokusWarna from './fokus-warna';
 import hitungCepat from './hitung-cepat';
+import ingatUrutan from './ingat-urutan';
 import memoryMatch from './memory-match';
 
 /**
@@ -13,6 +14,7 @@ const registry: Record<string, GameEntry> = {
     'hitung-cepat': hitungCepat as GameEntry,
     'fokus-warna': fokusWarna as GameEntry,
     'memory-match': memoryMatch as GameEntry,
+    'ingat-urutan': ingatUrutan as GameEntry,
 };
 
 export function resolveGame(slug: string): GameEntry {
