@@ -5,6 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string|null $display_name
+ * @property string|null $avatar
+ * @property int|null $preferred_level_id
+ * @property array<string, mixed>|null $settings
+ */
 class Profile extends Model
 {
     protected $fillable = [

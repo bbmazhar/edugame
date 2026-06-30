@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Models\GameSession;
 use App\Models\User;
 use App\Models\UserStat;
+use Illuminate\Support\Carbon;
 
 class RecordGameSession
 {
@@ -27,7 +28,7 @@ class RecordGameSession
             'game_id' => $gameId,
         ]);
 
-        $today = today();
+        $today = Carbon::today();
         $last = $stat->last_played_date;
 
         if ($last === null) {

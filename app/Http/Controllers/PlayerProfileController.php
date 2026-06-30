@@ -57,11 +57,13 @@ class PlayerProfileController extends Controller
             ]);
 
         return Inertia::render('profil', [
-            'displayName' => $user->profile?->display_name ?? $user->name,
+            // -> (not ?->) keeps PHPStan happy with Larastan's non-null relation
+            // typing; the trailing ?? default is still null-safe at runtime.
+            'displayName' => $user->profile->display_name ?? $user->name,
             'summary' => [
-                'totalSessions' => $aggregate?->total_sessions ?? 0,
-                'streak' => $aggregate?->streak_count ?? 0,
-                'bestScore' => $aggregate?->best_score ?? 0,
+                'totalSessions' => $aggregate->total_sessions ?? 0,
+                'streak' => $aggregate->streak_count ?? 0,
+                'bestScore' => $aggregate->best_score ?? 0,
                 'gamesPlayed' => $perGame->count(),
             ],
             'perGame' => $perGame,

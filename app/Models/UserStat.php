@@ -4,7 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property int|null $game_id
+ * @property int $best_score
+ * @property int $total_sessions
+ * @property int $streak_count
+ * @property Carbon|null $last_played_date
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class UserStat extends Model
 {
     protected $fillable = [

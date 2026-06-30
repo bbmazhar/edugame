@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'accessibility' => array_merge(
                 Profile::defaultSettings(),
-                $request->user()?->profile?->settings ?? [],
+                $request->user()?->profile->settings ?? [],
             ),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

@@ -4,7 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property int $game_id
+ * @property int $level_id
+ * @property int $score
+ * @property string $accuracy
+ * @property int $duration_ms
+ * @property int $rounds
+ * @property array<string, mixed>|null $metadata
+ * @property Carbon|null $played_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 class GameSession extends Model
 {
     protected $fillable = [

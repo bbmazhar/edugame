@@ -34,6 +34,9 @@ class RebuildUserStats
         $this->store($user->id, null, $sessions);
     }
 
+    /**
+     * @param  Collection<int, GameSession>  $group
+     */
     private function store(int $userId, ?int $gameId, Collection $group): void
     {
         $dates = $group
