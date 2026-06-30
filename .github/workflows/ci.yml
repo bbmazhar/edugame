@@ -2,8 +2,8 @@ name: Frontend Checks
 
 # Complements the starter-kit workflows (linter, tests) by adding the frontend
 # gates they don't cover: strict ESLint, TypeScript typecheck, and Vitest.
-# Assets are built first so generated Wayfinder files (@/routes, @/actions)
-# resolve for ESLint import-order and tsc.
+# PHP + composer are required because `npm run build` runs the Wayfinder
+# generator (php artisan wayfinder:generate) which produces @/routes & @/actions.
 
 on:
   push:
@@ -16,16 +16,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3, gd, zip, bcmath, fileinfo, curl, intl
+          coverage: none
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Install npm dependencies
         run: npm ci
 
-      - name: Build (generates Wayfinder files)
+      - name: Build (runs Wayfinder generator)
         run: npm run build
 
       - name: ESLint
