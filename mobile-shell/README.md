@@ -1,38 +1,37 @@
-# EduGame — Android Shell (Capacitor, Option A)
+# EduGame — Android App (Capacitor, Standalone / Offline)
 
-Wraps the **hosted** EduGame web app in a native Android WebView. Reuses 100% of
-the web (6 games + cookie auth + score sync) — no game re-development.
+A **fully standalone** Android app: the 6 games + local scores are **bundled into
+the APK** and run **offline — no server, no internet, no BASE_URL**.
 
-Full step-by-step plan: [`../GAME_EDUKASI_MOBILE_BUILD_WORKFLOW.md`](../GAME_EDUKASI_MOBILE_BUILD_WORKFLOW.md).
+Built as **Option B**: a self-contained React SPA (in `resources/js/standalone/`,
+reusing the existing game modules) compiled to `dist/`, which Capacitor packages
+into the APK.
 
-## What is committed here
+## What's here
 - `package.json` — Capacitor deps & scripts
-- `capacitor.config.ts` — shell config (🔧 fill `server.url`, host, `appId`)
-- `dist/index.html` — offline fallback page (real content comes from `server.url`)
+- `capacitor.config.ts` — offline config (`webDir: dist`, no `server.url`; 🔧 set `appId`)
+- `dist/` — the built standalone SPA (git-ignored; regenerate with `npm run build:standalone`)
 
-## Finish setup (requires Node + Android SDK / Android Studio — run by you)
+## Build the standalone web bundle (from repo root)
 ```bash
-cd mobile-shell
-
-# 1) Edit capacitor.config.ts: set HOSTED_URL, HOSTED_HOST, appId   🔧
-# 2) Install + add the Android platform (generates android/, git-ignored)
 npm install
-npx cap add android
-npx cap sync android
-
-# 3) Run on a device/emulator (loads the hosted site inside the app)
-npx cap run android
-
-# 4) Release build & signing → see workflow Fase 7
+npm run build:standalone     # → mobile-shell/dist  (the offline app)
 ```
 
-## Requirements
-- Hosted Laravel site live over **HTTPS** (`server.url`), with
-  `SESSION_SECURE_COOKIE=true`, `SESSION_SAME_SITE=lax` (workflow Fase 2).
-- Android SDK / Android Studio installed locally.
+## Package the APK (needs Android Studio / Android SDK — run by you)
+```bash
+cd mobile-shell
+# 1) edit capacitor.config.ts → set appId   🔧
+npm install
+npx cap add android          # generates android/ (git-ignored)
+npx cap sync android         # copies dist/ into the native project
+npx cap run android          # test on a device/emulator (works offline)
+# 2) release build + signing → see workflow Fase 7
+```
+
+After changing the games/SPA: `npm run build:standalone` (root) then `npx cap sync android`.
 
 ## Notes
-- Content/game updates ship via the **web deploy** — the APK is not reinstalled
-  for content. A new APK is only needed when this native shell changes.
-- App requires **internet** + the server alive (Inertia is server-driven); offline
-  shows `dist/index.html`.
+- No `BASE_URL`, no hosted website, no API needed — everything runs on-device.
+- Scores & accessibility settings are stored locally (localStorage), guest-first.
+- Updating game content requires shipping a new APK (no live web to push to).

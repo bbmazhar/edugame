@@ -5,3 +5,6 @@ node_modules/
 key.properties
 *.keystore
 *.jks
+
+# Standalone SPA build output (regenerate: npm run build:standalone)
+dist/

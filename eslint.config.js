@@ -107,9 +107,11 @@ export default [
             'vendor',
             'node_modules',
             'public',
+            'mobile-shell',
             'bootstrap/ssr',
             'tailwind.config.js',
             'vite.config.ts',
+            'vite.standalone.config.ts',
             'resources/js/actions/**',
             'resources/js/components/ui/*',
             'resources/js/routes/**',
@@ -134,6 +136,7 @@ export default [
         // relaxed for these files only.
         files: [
             'resources/js/games/**/*.{ts,tsx}',
+            'resources/js/standalone/**/*.{ts,tsx}',
             'resources/js/components/game-shell.tsx',
             'resources/js/hooks/use-accessibility.tsx',
             'resources/js/pages/play.tsx',

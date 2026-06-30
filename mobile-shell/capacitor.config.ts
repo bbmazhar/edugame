@@ -1,24 +1,13 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
-// EduGame Android shell (Option A): the WebView loads the hosted Laravel/Inertia
-// site directly, so all six games + cookie auth + score sync work as-is.
-//
-// 🔧 Fill these before building:
-//   - server.url        : the hosted HTTPS site
-//   - server.allowNavigation : the bare host(s) the WebView may navigate to
-//   - appId             : final application id
-const HOSTED_URL = 'https://REPLACE_WITH_BASE_URL'; // 🔧 [ISI: https://app.edugame.id]
-const HOSTED_HOST = 'REPLACE_WITH_BASE_URL_HOST'; // 🔧 [ISI: app.edugame.id]
-
+// EduGame standalone Android app (Option B): the offline SPA built into `dist`
+// (the 6 games + local storage) is bundled INTO the APK. No server, no BASE_URL,
+// no internet required. Rebuild the SPA with `npm run build:standalone` (repo
+// root) before `npx cap sync android`.
 const config: CapacitorConfig = {
     appId: 'com.edugame.app', // 🔧 [ISI: final applicationId]
     appName: 'EduGame',
-    webDir: 'dist', // offline fallback only; real content comes from server.url
-    server: {
-        url: HOSTED_URL,
-        cleartext: false, // HTTPS only
-        allowNavigation: [HOSTED_HOST],
-    },
+    webDir: 'dist',
     android: {
         backgroundColor: '#FDFDFC',
     },
